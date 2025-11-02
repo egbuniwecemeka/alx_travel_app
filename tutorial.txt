@@ -1,0 +1,34 @@
+Why use a virtual environment?
+
+A virtual environment is an isolated workspace for your Python project.
+
+1. Keeps dependencies separate from the system Python.
+
+2. Lets you use different package versions across projects.
+
+3. Avoids breaking system-wide Python apps.
+
+Steps
+venv
+1. Check if python is installed - python3 --version
+2. If not, install it - sudo apt install python3 python3-venv python3-pip -y
+3. Navigate to project folder
+4. Create virtual environment - python3 -m venv venv
+5. Activate the virtual environment - source venv/bin/activate or venv/Script/Activate
+6. Install dependencies or from requirement file
+7. Verify packages - pip list
+8. Import all python dependencies into a file - pip freeze > requirement.txt
+8. Confirm pip belongs to your env - which pip
+9. Deactivate venv - deactivate
+10. Remove venv - rm -rf venv
+
+Django
+install django - pip install django
+create django app - django-admin startproject <project_name>
+cd <project_name>
+install django REST framework - pip install djangorestframework
+Configure Django REST Framework - settings.py ('rest_framework')
+Create a Django Model for CRUD Operations - python3 manage.py startapp 
+
+Links
+[Build CRUD API with Django](https://python.plainenglish.io/how-to-build-a-crud-api-with-django-rest-framework-a-beginners-guide-for-2024-2025-fcf1b34e7326)
