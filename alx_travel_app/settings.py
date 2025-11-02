@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import environ
+import re
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,15 +22,60 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-4ytfo_*j0!+0*b(w4kot51&q2bm3f0_ecc&)t30(n9q-whji_t'
+# SECRET_KEY = 'django-insecure-qv22t=km8myyovc0kmzz5)op1&i-yy#bvht*rp31j-0(uz7=v='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
 
 
 # Application definition
+
+# Initialize environment settings
+env = environ.Env(
+    # Set default values and type casting
+    DEBUG=(bool, False)
+)
+
+# Read environment variables from the .env file
+environ.Env.read_env(BASE_DIR / '.env')
+
+# False if not in environ because of casting defined above
+DEBUG = env('DEBUG')
+
+# Raises ImproperlyConfigured error,
+# if the key is not in environment
+# Get your  SECRET_KEY from the environment (.env)
+SECRET_KEY = env('SECRET_KEY')
+
+# Parse database connection url strings
+DATABASES = {
+    # Reads DATABASE_URL from environment
+    # Raises ImproperlyConfigured error, if not in env
+    # db method is an alias for db_url
+    'default': env.db(),
+}
+
+""" CACHES = {
+    # Reads environ CACHE_URL
+    # Raises ImproperlyConfigured exception if not found
+    #
+    # cache is an alias for cache_url
+    'default': env.cache(),
+
+    # Reads environ REDIS_URL
+    'redis': env.cache_url('REDIS')
+} """
+
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+
+def parse_email_list(value):
+    pattern = r'([^,<]+)\s*<([^>]+)>'
+    return re.findall(pattern, value)
+
+ADMINS = parse_email_list(env('ADMINS'))
+MANAGERS = parse_email_list(env('MANAGERS'))
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -36,10 +83,15 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles', # required for serving swagger ui's css/js files
+    'rest_framework',
+    'listings',
+    'corsheaders',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
